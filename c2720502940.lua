@@ -1,8 +1,19 @@
 --Genesis Ectonurite
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
-	local e1=Effect.CreateEffect(c)
+    --Negate
+    local e1=Effect.CreateEffect(c)
+    e1:SetDescription(aux.Stringid(id,0))
+    e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+    e1:SetType(EFFECT_TYPE_QUICK_O)
+    e1:SetCode(EVENT_CHAINING)
+    e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+    e1:SetRange(LOCATION_HAND)
+    e1:SetCondition(s.discon)
+    e1:SetCost(s.discost)
+    e1:SetTarget(s.distg)
+    e1:SetOperation(s.disop)
+    c:RegisterEffect(e1)
 	--activate effect from graveyard
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
@@ -16,6 +27,21 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
+end
+function s.discon(e,tp,eg,ep,ev,re,r,rp)
+    return ep~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
+end
+function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsDiscardable() end
+	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+end
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not re:GetHandler():IsStatus(STATUS_DISABLED) end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+end
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.NegateEffect(ev)
 end
 function s.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsDisabled()

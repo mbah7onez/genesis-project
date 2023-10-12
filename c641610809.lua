@@ -1,6 +1,8 @@
 -- --Genesis Methanosian
 local s,id=GetID()
 function s.initial_effect(c)
+	--Fusion Summon procedure
+	Fusion.AddProcMixN(c,true,true,s.ffilter,2)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -14,12 +16,15 @@ function s.initial_effect(c)
 	e1:SetOperation(s.hspop)
 	c:RegisterEffect(e1)
 end
+function s.ffilter(c,fc,sumtype,sp,sub,mg,sg)
+	return c:IsRace(RACE_DRAGON+RACE_PYRO+RACE_PLANT,fc,sumtype,sp) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or not sg:IsExists(Card.IsRace,1,c,c:GetRace(),fc,sumtype,sp))
+end
 function s.rfilter(c)
-	return (c:IsRace(RACE_DRAGON+RACE_PYRO+RACE_PLANT) or c:IsAttribute(ATTRIBUTE_EARTH)) and c:IsAbleToRemoveAsCost() 
+	return c:IsRace(RACE_DRAGON+RACE_PYRO+RACE_PLANT) and c:IsAbleToRemoveAsCost() 
 		and (c:IsFaceup() or aux.SpElimFilter(c,true))
 end
 function s.hspcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local rg=Duel.GetMatchingGroup(s.rfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,0,e:GetHandler())
+	local rg=Duel.GetMatchingGroup(s.rfilter,tp,LOCATION_GRAVE+LOCATION_MZONE,LOCATION_GRAVE,0,e:GetHandler())
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and #rg>1 
 		and aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),0) end
 	local g=aux.SelectUnselectGroup(rg,e,tp,2,2,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE)

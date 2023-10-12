@@ -59,7 +59,7 @@ function s.chfilter(c,e)
 	return c:IsFaceup() and c:IsCanBeEffectTarget(e)
 end
 function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local g=Duel.GetMatchingGroup(s.chfilter,tp,LOCATION_MZONE,0,nil,e)
+	local g=Duel.GetMatchingGroup(s.chfilter,tp,LOCATION_MZONE,LOCATION_MZONE,0,e)
 	if chk==0 then return #g>0 end
 	if Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2))==0 then
 		local rc=Duel.AnnounceAnotherRace(g,tp)
